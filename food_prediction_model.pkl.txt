@@ -1,0 +1,266 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "106b7212-35b6-4f97-801b-6feb048e39a5",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "from sklearn.model_selection import train_test_split\n",
+    "from sklearn.linear_model import LinearRegression\n",
+    "from sklearn.metrics import mean_squared_error\n",
+    "import pickle\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "079dae64-97ac-40a2-acde-c361c3683f7d",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Region</th>\n",
+       "      <th>Day of Week</th>\n",
+       "      <th>Temperature (°C)</th>\n",
+       "      <th>Past Demand</th>\n",
+       "      <th>Predicted Demand</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>1</td>\n",
+       "      <td>1</td>\n",
+       "      <td>30</td>\n",
+       "      <td>200</td>\n",
+       "      <td>210</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>2</td>\n",
+       "      <td>2</td>\n",
+       "      <td>28</td>\n",
+       "      <td>250</td>\n",
+       "      <td>245</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>3</td>\n",
+       "      <td>3</td>\n",
+       "      <td>26</td>\n",
+       "      <td>180</td>\n",
+       "      <td>190</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>4</td>\n",
+       "      <td>4</td>\n",
+       "      <td>32</td>\n",
+       "      <td>300</td>\n",
+       "      <td>320</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>5</td>\n",
+       "      <td>5</td>\n",
+       "      <td>27</td>\n",
+       "      <td>220</td>\n",
+       "      <td>230</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   Region  Day of Week  Temperature (°C)  Past Demand  Predicted Demand\n",
+       "0       1            1                30          200               210\n",
+       "1       2            2                28          250               245\n",
+       "2       3            3                26          180               190\n",
+       "3       4            4                32          300               320\n",
+       "4       5            5                27          220               230"
+      ]
+     },
+     "execution_count": 2,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Example: Load the dataset\n",
+    "df = pd.read_excel(\"food_demand.xlsx\")\n",
+    "\n",
+    "# Let's inspect the first few rows\n",
+    "df.head()\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "6db10f7e-a9ae-4577-86fa-a9aea94d0eb4",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Define features (X) and target variable (y)\n",
+    "X = df[[\"Region\", \"Day of Week\", \"Temperature (°C)\", \"Past Demand\"]]\n",
+    "y = df[\"Predicted Demand\"]\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "57885399-b70c-43f8-a029-bd680bcbe3a0",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "((4, 4), (1, 4))"
+      ]
+     },
+     "execution_count": 4,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Split the data into training and testing sets (80% train, 20% test)\n",
+    "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\n",
+    "\n",
+    "# Verify the split\n",
+    "X_train.shape, X_test.shape\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "9009bf14-56fb-4306-8bb7-93034a0c2f48",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Mean Squared Error: 1065.8304498269995\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Create a Linear Regression model\n",
+    "model = LinearRegression()\n",
+    "\n",
+    "# Train the model\n",
+    "model.fit(X_train, y_train)\n",
+    "\n",
+    "# Make predictions on the test set\n",
+    "y_pred = model.predict(X_test)\n",
+    "\n",
+    "# Evaluate the model using Mean Squared Error (MSE)\n",
+    "mse = mean_squared_error(y_test, y_pred)\n",
+    "print(f\"Mean Squared Error: {mse}\")\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "b8c2ab5d-aba8-4549-ad3b-91288e4fc9e6",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Model saved as 'food_prediction_model.pkl'\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Save the trained model to a .pkl file\n",
+    "with open(\"food_prediction_model.pkl\", \"wb\") as file:\n",
+    "    pickle.dump(model, file)\n",
+    "    \n",
+    "print(\"Model saved as 'food_prediction_model.pkl'\")\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "77210e02-607d-46a0-956f-df7ac95a72c8",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Predictions from loaded model: [277.64705882]\n",
+      "Original predictions: [277.64705882]\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Load the saved model\n",
+    "with open(\"food_prediction_model.pkl\", \"rb\") as file:\n",
+    "    loaded_model = pickle.load(file)\n",
+    "\n",
+    "# Test the loaded model\n",
+    "y_pred_loaded = loaded_model.predict(X_test)\n",
+    "\n",
+    "# Compare predictions to check if loading works correctly\n",
+    "print(f\"Predictions from loaded model: {y_pred_loaded[:5]}\")\n",
+    "print(f\"Original predictions: {y_pred[:5]}\")\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "6af4f705-4da4-4e3c-8ba7-e6d27cabd83b",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.7"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
